@@ -1,0 +1,95 @@
+<header class="page-header header container">
+    <h1>Záznam dat z elektrárny dne @ViewBag.date</h1>
+    @if (!ViewBag.validDate) {
+        <text><p class="text-danger text-sm mb-0 pb-0">Neplatné datum, byli jste přesměrováni na dnešek.</p></text>
+    }
+    @if (!ViewBag.validOffset) {
+        <text><p class="text-danger text-sm mt-0 pt-0">Neplatný posun v datech, nebyli jste přesměrováni.</p></text>
+    }
+    @if (!ViewBag.validCSV) {
+        <text><p class="text-warning text-sm mt-0 pt-0">Pro tento den nebyli zaznamenány žádná data.</p></text>
+    }
+</header>
+
+<div class="container">
+    <p>
+        <img alt="battery" type="image/png" src="~/battery-32.png" />
+        @ViewBag.battery%
+    </p>
+</div>
+
+<div class="container">
+    <button class="btn btn-dark" onclick="window.location.href='/Home/ElektrarnaZaznam?d=@ViewBag.date&o=-1';">
+        &lt;
+    </button>
+
+    <button class="btn btn-dark" onclick="window.location.href='/Home/ElektrarnaZaznam?d=@ViewBag.date&o=1';">
+        &gt;
+    </button>
+
+    <button class="btn btn-dark" onclick="window.location.href='/Home/ElektrarnaZaznam';">
+        Dnešek
+    </button>
+
+    <div id="chart-div">
+        <canvas id="chart"></canvas>
+    </div>
+
+    <script>
+        @foreach (var item in @ViewBag.CSV)
+        {
+            <text>var </text>
+            @item.name
+            <text> = </text>
+            @Html.Raw(Json.Serialize(item.data.ToArray()));
+            <text>;</text>
+        }
+
+        var data = {
+            labels: @ViewBag.CSV[0].name,
+            datasets: [
+                @foreach (var itm in @ViewBag.CSV)
+                {
+                    if (itm.name == @ViewBag.CSV[0].name) continue;
+                    
+                    <text>
+                    {
+                        label: '@itm.name',
+                        data: @itm.name,
+
+                        @if (itm.name == "battery_soc") {
+                            <text>yAxisID: 'B'</text>
+                        }
+                        else {
+                            <text>yAxisID: 'A'</text>
+                        }
+                    },
+                    </text>
+                }
+            ],
+        };
+
+        var chart = new Chart(document.getElementById('chart'), {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    A: {
+                        type: "@ViewBag.chartType",
+                    },
+                    B: {
+                        type: "linear",
+                        position: "right",
+                        min: 0,
+                        max: 100
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 0
+                    }
+                }
+            }
+        });
+    </script>
+</div>

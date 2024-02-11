@@ -1,0 +1,27 @@
+<header class="page-header header container">
+    <h1>Data z elektrárny právě teď</h1>
+</header>
+
+<div class="container text-center">
+    <table class="container text-center">
+        <thead>
+            <tr>
+                <!--td><strong>id</strong></td-->
+                <td><strong>name</strong></td>
+                <td><strong>data</strong></td>
+                <td><strong>unit</strong></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sensor in @ViewBag.data)
+            {
+                <tr>
+                    <!--td>@sensor.id</td-->
+                    <td title="@sensor.id">@sensor.name</td>
+                    <td>@sensor.data</td>
+                    <td>@sensor.unit</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
